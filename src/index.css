@@ -256,6 +256,17 @@ body {
   height: 100dvh;
 }
 
+/*
+ * The wallpaper (1920×1080) is centred on x 775 of the picture instead of
+ * its middle, so the band is what an upright phone shows. With `cover` the
+ * picture is drawn --wallpaper-width wide; the offset is clamped so its
+ * edges never come inside the screen (e.g. a phone held sideways).
+ */
+.is-mobile .xp-desktop {
+  --wallpaper-width: max(100vw, 100dvh * 1920 / 1080);
+  background-position: clamp(100vw - var(--wallpaper-width), 50vw - var(--wallpaper-width) * 775 / 1920, 0px) center;
+}
+
 .is-mobile .mobile-window {
   inset: var(--mobile-window-gap) var(--mobile-window-gap) calc(30px + var(--mobile-window-gap));
 }

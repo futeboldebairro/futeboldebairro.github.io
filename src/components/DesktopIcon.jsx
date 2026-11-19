@@ -21,9 +21,7 @@ function DesktopIcon({ icon, iconElement, badge, label, href, selected, onSelect
   const caption = (
     <span
       // XP breaks a name that is one long word, rather than letting it spill out
-      className={`px-0.5 text-center leading-tight text-white [overflow-wrap:anywhere] ${
-        selected ? 'bg-[#316ac5]' : '[text-shadow:1px_1px_1px_black]'
-      }`}
+      className={`text-center leading-tight text-white [overflow-wrap:anywhere] ${captionLook(selected, isMobile)}`}
     >
       {label}
     </span>
@@ -62,6 +60,17 @@ function DesktopIcon({ icon, iconElement, badge, label, href, selected, onSelect
       {caption}
     </button>
   )
+}
+
+/*
+ * XP's white name with a drop shadow, or its blue highlight when selected.
+ * On a phone, with the band's photo behind, the name gets a dark backing
+ * so it can be read over any part of the wallpaper.
+ */
+function captionLook(selected, isMobile) {
+  if (selected) return 'bg-[#316ac5] px-0.5'
+  if (isMobile) return 'rounded-[3px] bg-black/55 px-1 py-px [text-shadow:1px_1px_1px_black]'
+  return 'px-0.5 [text-shadow:1px_1px_1px_black]'
 }
 
 export default DesktopIcon
