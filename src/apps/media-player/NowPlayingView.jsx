@@ -1,5 +1,6 @@
 import listPaneHideIcon from '../../assets/wmp/list-pane-hide.png'
 import listPaneShowIcon from '../../assets/wmp/list-pane-show.png'
+import useIsMobile from '../../hooks/useIsMobile'
 import { formatTime } from './formatTime'
 import StreamingLinks from './StreamingLinks'
 import { albumArtTransitionName } from './viewTransition'
@@ -21,8 +22,9 @@ function NowPlayingView({
   const { track, album } = player.current
 
   return (
-    <div className="flex h-full">
-      <div className="relative min-w-0 flex-1">
+    // On a phone the visualization sits above the list pane instead of beside it (see media-player.css)
+    <div className="wmp-now-playing flex h-full">
+      <div className="wmp-now-playing-visual relative min-w-0 flex-1">
         <Visualizer analyser={player.analyser} isPlaying={player.isPlaying} visualization={visualization} />
 
         {/* WMP briefly names the visualization when it changes; re-keyed so the fade restarts */}
@@ -54,6 +56,8 @@ function ListPane({ player, onHide, onOpenCase }) {
   const { album } = player.current
   // Only releases with a back cover have a full CD case to show
   const hasCase = Boolean(album.backCover)
+  // Double-tapping isn't something phones do reliably, so there a single tap plays the song
+  const isMobile = useIsMobile()
 
   return (
     <aside className="wmp-list-pane flex w-[200px] shrink-0 flex-col">
@@ -92,8 +96,9 @@ function ListPane({ player, onHide, onOpenCase }) {
               className={`wmp-list-pane-song flex w-full items-center gap-2 px-2 ${
                 index === player.currentIndex ? 'current' : ''
               }`}
-              onDoubleClick={() => player.playQueueIndex(index)}
-              title="Clique duas vezes para reproduzir"
+              onClick={isMobile ? () => player.playQueueIndex(index) : undefined}
+              onDoubleClick={isMobile ? undefined : () => player.playQueueIndex(index)}
+              title={isMobile ? undefined : 'Clique duas vezes para reproduzir'}
             >
               <span className="min-w-0 flex-1 truncate text-left">{track.title}</span>
               <span className="wmp-list-pane-duration">{formatTime(track.duration)}</span>

@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import PlayerProvider from './apps/media-player/PlayerProvider'
 import BootScreen from './components/BootScreen'
 import Desktop from './components/Desktop'
 import WelcomeBox from './components/WelcomeBox'
 import { DisplayScaleContext, SCALE_OPTIONS } from './hooks/displayScale'
+import useIsMobile from './hooks/useIsMobile'
 import useStoredState from './hooks/useStoredState'
 import { playSound } from './sounds/sounds'
 
@@ -25,7 +26,12 @@ function App() {
     playSound('xpStartup', { retryWithin: 60000 })
   }, [])
 
-  const startDesktop = useCallback(() => setStage('running'), [])
+  // After OK the desktop appears still blurred like the welcome screen, then comes into focus
+  const [unblurring, setUnblurring] = useState(false)
+  const startDesktop = useCallback(() => {
+    setStage('running')
+    setUnblurring(true)
+  }, [])
 
   const reboot = useCallback(() => {
     setBootCount((count) => count + 1)
@@ -33,9 +39,16 @@ function App() {
   }, [])
 
   // How big the desktop is drawn, picked from the taskbar and remembered (see hooks/displayScale.js)
+  // On a phone the screen is already small, so it's always drawn at 100%
+  const isMobile = useIsMobile()
   const [storedScale, setScale] = useStoredState('display:scale', 1)
-  const scale = SCALE_OPTIONS.includes(storedScale) ? storedScale : 1
+  const scale = !isMobile && SCALE_OPTIONS.includes(storedScale) ? storedScale : 1
   const displayScale = useMemo(() => ({ scale, setScale }), [scale, setScale])
+
+  // Lets the stylesheets switch to the phone layout (see hooks/useIsMobile.js)
+  useEffect(() => {
+    document.documentElement.classList.toggle('is-mobile', isMobile)
+  }, [isMobile])
 
   return (
     <PlayerProvider>
@@ -45,6 +58,9 @@ function App() {
           <div style={{ zoom: scale, width: '100%', height: '100%' }}>
             <Desktop key={bootCount} onReboot={reboot} />
           </div>
+        )}
+        {stage === 'running' && unblurring && (
+          <div className="desktop-unblur" onAnimationEnd={() => setUnblurring(false)} />
         )}
         {stage === 'welcome' && <WelcomeBox onOk={startDesktop} />}
         {stage === 'boot' && <BootScreen onDone={showWelcome} />}

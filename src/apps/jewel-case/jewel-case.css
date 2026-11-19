@@ -153,3 +153,14 @@
 .jc-button:disabled {
   filter: saturate(0.3) brightness(0.75);
 }
+
+/* ---------- Phone layout ---------- */
+
+/* An open spread (two pages) fits across the screen; pinching zooms in on the small print */
+.is-mobile .jc-stage {
+  --page-size: min(320px, calc((100vw - 32px) / 2));
+}
+/* The fingers drive the booklet's own pan and zoom, not the browser's */
+.jc-booklet-view.visible {
+  touch-action: none;
+}

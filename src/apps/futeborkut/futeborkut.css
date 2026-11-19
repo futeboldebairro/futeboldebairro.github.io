@@ -992,3 +992,117 @@
 .futeborkut .pager .showing {
   margin-right: 10px;
 }
+
+/* ---------- Phone layout ---------- */
+
+/*
+ * One column, as narrow as the phone: the profile card on top, then the
+ * page itself, then what was the right column. The blue bar keeps the logo
+ * and the menu; the search box gets a row of its own under them.
+ */
+.is-mobile .futeborkut,
+.is-mobile .futeborkut .headerin,
+.is-mobile .futeborkut .container {
+  min-width: 0;
+}
+.is-mobile .futeborkut .header {
+  height: auto;
+}
+.is-mobile .futeborkut .headerin {
+  display: flow-root;
+  height: auto;
+  padding-bottom: 5px;
+}
+.is-mobile .futeborkut .login {
+  display: none;
+}
+/* A smaller logo, so the whole menu fits on the bar */
+.is-mobile .futeborkut .menu li.logobg {
+  margin-right: 4px;
+}
+.is-mobile .futeborkut .header-logo {
+  height: 23px;
+  margin-top: 4px;
+}
+.is-mobile .futeborkut .mainsearch {
+  float: none;
+  clear: both;
+  width: auto;
+  height: 28px;
+  margin: 0 6px;
+  display: flex;
+}
+.is-mobile .futeborkut .mainsearch input {
+  flex: 1;
+  width: auto;
+  height: 20px;
+  margin: 3px 0 3px 6px;
+}
+.is-mobile .futeborkut .mainsearch button {
+  width: 30px;
+  height: 28px;
+}
+.is-mobile .futeborkut .mainsearch .magnifier {
+  top: 7px;
+  left: 9px;
+}
+
+.is-mobile .futeborkut .container {
+  display: flex;
+  /* Tailwind's own .container sets width: 100%, which the padding would push past the edge */
+  width: auto;
+  flex-direction: column;
+  padding: 0 6px;
+}
+.is-mobile .futeborkut .lbox,
+.is-mobile .futeborkut .rbox {
+  float: none;
+  width: auto;
+}
+.is-mobile .futeborkut .mbox,
+.is-mobile .futeborkut .mboxfull {
+  margin: 0;
+}
+.is-mobile .futeborkut .mbox,
+.is-mobile .futeborkut .mboxfull,
+.is-mobile .futeborkut .mboxalone {
+  order: 1;
+}
+.is-mobile .futeborkut .rbox {
+  order: 2;
+}
+.is-mobile .futeborkut .footer {
+  order: 3;
+  height: auto;
+  padding: 6px 10px;
+  line-height: 18px;
+  white-space: normal;
+}
+.is-mobile .futeborkut .footer .txtfooter {
+  float: none;
+  display: block;
+}
+
+/* Wide things inside a box shrink to it */
+.is-mobile .futeborkut .photoview .bigphoto {
+  box-sizing: border-box;
+}
+.is-mobile .futeborkut .forum {
+  width: 100%;
+}
+
+/* The login page's two panels, one above the other */
+.is-mobile .futeborkut .logintable,
+.is-mobile .futeborkut .logintable tbody,
+.is-mobile .futeborkut .logintable tr,
+.is-mobile .futeborkut .logintable td {
+  display: block;
+  width: auto;
+}
+.is-mobile .futeborkut .logintable td:empty {
+  height: 10px;
+}
+.is-mobile .futeborkut .collage img {
+  width: 72px;
+  height: 72px;
+}

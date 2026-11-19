@@ -141,3 +141,11 @@
   text-decoration: none !important;
   cursor: default !important;
 }
+
+/*
+ * On a phone the menu bars go: the picture and status are changed from the
+ * contact list's header, and Chamar a atenção has its own button.
+ */
+.is-mobile .msn-menubar {
+  display: none;
+}

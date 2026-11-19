@@ -345,3 +345,8 @@
 .msn-buddy-psm {
   font-style: italic;
 }
+
+/* Taller contact rows on a phone, to tap */
+.is-mobile .msn-buddy {
+  height: 32px;
+}

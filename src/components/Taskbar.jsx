@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import windowsLogo from '../assets/xp/windows-logo.png'
+import useIsMobile from '../hooks/useIsMobile'
 import DisplayScaleControl from './DisplayScaleControl'
 import VolumeControl from './VolumeControl'
 
@@ -7,8 +8,11 @@ import VolumeControl from './VolumeControl'
  * `items` is one entry per open window: { id, title, icon, active }.
  * `buttonRef(id)` registers each button so windows can animate into it.
  * `tray` holds apps' own notification-area icons (MSN), left of the volume.
+ * On a phone the buttons shrink to their icons (the title is still their
+ * label) and the screen size control goes, as the phone sets its own size.
  */
 function Taskbar({ items, onItemClick, buttonRef, tray }) {
+  const isMobile = useIsMobile()
   return (
     <div className="xp-taskbar absolute inset-x-0 bottom-0 z-[1000] flex items-center">
       {/* No start menu yet, so the button only shows its hover/pressed states */}
@@ -17,24 +21,27 @@ function Taskbar({ items, onItemClick, buttonRef, tray }) {
         <span className="xp-start-label">iniciar</span>
       </button>
 
-      <div className="flex min-w-0 flex-1 items-center gap-0.5 px-2">
+      {/* On a phone, more buttons than fit scroll sideways within the taskbar */}
+      <div className={`flex min-w-0 flex-1 items-center gap-0.5 px-2 ${isMobile ? 'taskbar-items-scroll' : ''}`}>
         {items.map((item) => (
           <button
             key={item.id}
             ref={buttonRef(item.id)}
             type="button"
-            className={`xp-taskbar-item flex w-40 min-w-0 items-center gap-1 px-1 text-white ${item.active ? '' : 'inactive'}`}
+            className={`xp-taskbar-item flex min-w-0 items-center gap-1 px-1 text-white ${isMobile ? 'compact' : 'w-40'} ${item.active ? '' : 'inactive'}`}
+            title={isMobile ? item.title : undefined}
+            aria-label={isMobile ? item.title : undefined}
             onClick={() => onItemClick(item.id)}
           >
             {item.icon && <img src={item.icon} alt="" className="size-4 shrink-0" />}
-            <span className="truncate">{item.title}</span>
+            {!isMobile && <span className="truncate">{item.title}</span>}
           </button>
         ))}
       </div>
 
       <div className="xp-tray flex items-center gap-2 px-3 text-white">
         {tray}
-        <DisplayScaleControl />
+        {!isMobile && <DisplayScaleControl />}
         <VolumeControl />
         <Clock />
       </div>

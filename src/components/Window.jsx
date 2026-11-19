@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useDisplayScale } from '../hooks/displayScale'
+import useIsMobile from '../hooks/useIsMobile'
 import useMinimizeAnimation from '../hooks/useMinimizeAnimation'
 import ResizeHandles from './ResizeHandles'
 
@@ -36,6 +37,9 @@ function Window({
 }) {
   const [position, setPosition] = useState(initialPosition)
   const { scale } = useDisplayScale()
+  // On a phone every window is always maximized, inset a little from the screen's edges
+  // (see .mobile-window in index.css), and can't be moved, resized or minimized
+  const isMobile = useIsMobile()
   const [maximized, setMaximized] = useState(false)
   // Where a proportional window goes when maximized (see largestProportionalRect)
   const [maximizedRect, setMaximizedRect] = useState(null)
@@ -49,7 +53,7 @@ function Window({
   useMinimizeAnimation(windowRef, minimized, getTaskbarButton)
 
   function toggleMaximized() {
-    if (!maximizable) return
+    if (!maximizable || isMobile) return
     // Content with fixed proportions can't fill the whole screen: it gets the biggest box that fits, measured now
     if (!maximized && contentAspectRatio) setMaximizedRect(largestProportionalRect())
     setMaximized((current) => !current)
@@ -79,7 +83,7 @@ function Window({
 
   function handlePointerDown(event) {
     // Let the caption buttons receive their own clicks; a maximized window can't be dragged
-    if (event.target.closest('button') || maximized) return
+    if (event.target.closest('button') || maximized || isMobile) return
 
     // The pointer reports real screen pixels; the window lives in the (possibly zoomed) desktop's
     dragOffset.current = {
@@ -138,7 +142,14 @@ function Window({
   }
 
   // Content stretches to fill the window once it has a set height
-  const fillsWindow = maximized || size.height !== null
+  const fillsWindow = maximized || isMobile || size.height !== null
+
+  function placement() {
+    if (isMobile) return { zIndex }
+    if (maximized && maximizedRect) return { left: maximizedRect.x, top: 0, width: maximizedRect.width, height: maximizedRect.height, zIndex }
+    if (maximized) return { left: 0, top: 0, width: 'calc(100% - var(--sidebar-width, 0px))', height: `calc(100% - ${TASKBAR_HEIGHT}px)`, zIndex }
+    return { left: position.x, top: position.y, width: size.width, height: size.height ?? undefined, zIndex }
+  }
 
   return (
     <div
@@ -146,19 +157,13 @@ function Window({
       // Lets an app find its own window, e.g. to shake it (MSN's nudge)
       data-window
       // A minimized window is invisible (see useMinimizeAnimation) but still in the page, so make it unclickable
-      className={`absolute flex flex-col ${active ? '' : 'inactive-window'} ${fillsWindow ? 'window-fill' : ''}`}
+      className={`absolute flex flex-col ${active ? '' : 'inactive-window'} ${fillsWindow ? 'window-fill' : ''} ${isMobile ? 'mobile-window' : ''}`}
       // Maximized, it fills the desktop above the taskbar and left of the sidebar; it remembers where it was for when it's restored
-      style={
-        maximized && maximizedRect
-          ? { left: maximizedRect.x, top: 0, width: maximizedRect.width, height: maximizedRect.height, zIndex }
-          : maximized
-            ? { left: 0, top: 0, width: 'calc(100% - var(--sidebar-width, 0px))', height: `calc(100% - ${TASKBAR_HEIGHT}px)`, zIndex }
-            : { left: position.x, top: position.y, width: size.width, height: size.height ?? undefined, zIndex }
-      }
+      style={placement()}
       inert={minimized}
       onPointerDownCapture={onFocus}
     >
-      {maximizable && !maximized && (
+      {maximizable && !maximized && !isMobile && (
         <ResizeHandles getRect={currentRect} onResize={handleResize} minWidth={minWidth} minHeight={minHeight} />
       )}
       <div
@@ -173,14 +178,18 @@ function Window({
           <span className="xp-title truncate">{title}</span>
         </div>
         <div className="flex shrink-0 gap-0.5">
-          <button type="button" aria-label="Minimizar" className="xp-caption-button minimize" onClick={onMinimize} />
-          <button
-            type="button"
-            aria-label={maximized ? 'Restaurar' : 'Maximizar'}
-            className={`xp-caption-button ${maximized ? 'restore' : 'maximize'}`}
-            disabled={!maximizable}
-            onClick={toggleMaximized}
-          />
+          {!isMobile && (
+            <>
+              <button type="button" aria-label="Minimizar" className="xp-caption-button minimize" onClick={onMinimize} />
+              <button
+                type="button"
+                aria-label={maximized ? 'Restaurar' : 'Maximizar'}
+                className={`xp-caption-button ${maximized ? 'restore' : 'maximize'}`}
+                disabled={!maximizable}
+                onClick={toggleMaximized}
+              />
+            </>
+          )}
           <button type="button" aria-label="Fechar" className="xp-caption-button close" onClick={onClose} />
         </div>
       </div>

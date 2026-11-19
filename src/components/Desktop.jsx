@@ -36,10 +36,15 @@ import showDoFutebasSmallIcon from '../assets/xp/icons/star-2.png'
 import messengerContactListIcon from '../apps/messenger/assets/title-contactlist.png'
 import messengerConversationIcon from '../apps/messenger/assets/title-conversation.png'
 import { usePlayerUnload } from '../apps/media-player/playerContext'
+import useIsMobile from '../hooks/useIsMobile'
 import useStoredState from '../hooks/useStoredState'
 import useWindowManager from '../hooks/useWindowManager'
 import DesktopIcon from './DesktopIcon'
+import { INSTAGRAM, MUSIC_SERVICES } from './sidebar/externalLinks'
 import Sidebar from './sidebar/Sidebar'
+import AeroOrb from './streaming/AeroOrb'
+import RetroInstagramIcon from './streaming/RetroInstagramIcon'
+import { SERVICES } from './streaming/services'
 import Taskbar from './Taskbar'
 import Window from './Window'
 
@@ -175,6 +180,7 @@ function staticTitleOf(appId, props) {
  * The icons on the desktop. A shortcut opens an app, optionally with props for its window.
  * Web shortcuts open Internet Explorer on a site, and carry IE's icon in the corner;
  * text files open in Notepad. Label and icon default to the app's own.
+ * `desktopOnly` shortcuts aren't shown on a phone (a keyboard game can't be played there).
  */
 const DESKTOP_SHORTCUTS = [
   textFile({ id: 'aboutTheBand', fileName: 'Sobre a Banda', text: aboutTheBand }),
@@ -184,7 +190,7 @@ const DESKTOP_SHORTCUTS = [
   { id: 'internetExplorer', appId: 'internetExplorer' },
   { id: 'messenger', appId: 'messenger' },
   { id: 'showDoFutebas', appId: 'showDoFutebas' },
-  { id: 'sportsHeads', appId: 'sportsHeads' },
+  { id: 'sportsHeads', appId: 'sportsHeads', desktopOnly: true },
 ]
 
 function webShortcut({ id, label, icon, url }) {
@@ -195,11 +201,31 @@ function webShortcut({ id, label, icon, url }) {
 function textFile({ id, fileName, text }) {
   return { id, appId: 'notepad', props: { fileName, text }, label: fileName, icon: notepadIcon }
 }
+/*
+ * On a phone there's no sidebar, so its LINKS EXTERNOS (the band's Instagram
+ * and music services) become icons on the desktop, after the shortcuts.
+ * They open in a new tab of the visitor's real browser.
+ */
+const BAND_LINKS = [
+  { id: 'instagram', label: 'Instagram', href: INSTAGRAM.url, iconElement: <RetroInstagramIcon size={48} /> },
+  ...SERVICES.map((service) => ({
+    id: service.key,
+    label: service.name,
+    href: MUSIC_SERVICES[service.key],
+    iconElement: (
+      <AeroOrb light={service.light} dark={service.dark} size={48}>
+        <service.Glyph />
+      </AeroOrb>
+    ),
+  })),
+]
+
 // How far each extra window of the same app is moved down and right
 const CASCADE_STEP = 24
 
 function Desktop({ onReboot }) {
   const windowManager = useWindowManager()
+  const isMobile = useIsMobile()
   const unloadMusic = usePlayerUnload()
   const [selectedShortcut, setSelectedShortcut] = useState(null)
   // The widget sidebar can be folded away to a thin tab on the right edge (remembered across visits)
@@ -282,14 +308,22 @@ function Desktop({ onReboot }) {
     active: window.id === windowManager.activeId && !window.minimized,
   }))
 
+  // Folded, the sidebar is just its tab, and maximized windows take the space it left; phones have none
+  function sidebarWidthStyle() {
+    if (isMobile) return { '--sidebar-width': '0px' }
+    if (!sidebarOpen) return { '--sidebar-width': 'var(--sidebar-tab-width)' }
+    return undefined
+  }
+
+  const shortcuts = isMobile ? DESKTOP_SHORTCUTS.filter((shortcut) => !shortcut.desktopOnly) : DESKTOP_SHORTCUTS
+
   const SplashScreen = splashAppId && APPS[splashAppId].Splash
 
   return (
     <div
       // XP's "working in background" cursor (arrow and hourglass) while an app starts
       className={`xp-desktop relative h-full w-full overflow-hidden ${splashAppId ? 'cursor-progress' : ''}`}
-      // Folded, the sidebar is just its tab, and maximized windows take the space it left
-      style={sidebarOpen ? undefined : { '--sidebar-width': 'var(--sidebar-tab-width)' }}
+      style={sidebarWidthStyle()}
       onPointerDown={() => setSelectedShortcut(null)}
     >
       <MessengerProvider
@@ -301,8 +335,9 @@ function Desktop({ onReboot }) {
           onReboot()
         }}
       >
-      <div className="absolute top-2 left-2 flex flex-col gap-2">
-        {DESKTOP_SHORTCUTS.map(({ id, appId, props, label, icon, badge }) => (
+      {/* A column down the left edge, as in XP; on a phone, rows that fill the screen like a home screen */}
+      <div className={isMobile ? 'desktop-icons-mobile' : 'absolute top-2 left-2 flex flex-col gap-2'}>
+        {shortcuts.map(({ id, appId, props, label, icon, badge }) => (
           <DesktopIcon
             key={id}
             icon={icon ?? APPS[appId].icon}
@@ -313,14 +348,27 @@ function Desktop({ onReboot }) {
             onOpen={() => launch(appId, props)}
           />
         ))}
+        {isMobile &&
+          BAND_LINKS.map(({ id, label, href, iconElement }) => (
+            <DesktopIcon
+              key={id}
+              iconElement={iconElement}
+              label={label}
+              href={href}
+              selected={selectedShortcut === id}
+              onSelect={() => setSelectedShortcut(id)}
+            />
+          ))}
       </div>
 
-      {/* The widgets on the right; windows open over it */}
-      <Sidebar
-        open={sidebarOpen}
-        onToggle={() => setSidebarOpen((open) => !open)}
-        onOpenPlayer={() => launch('mediaPlayer')}
-      />
+      {/* The widgets on the right; windows open over it. Phones have no room for it */}
+      {!isMobile && (
+        <Sidebar
+          open={sidebarOpen}
+          onToggle={() => setSidebarOpen((open) => !open)}
+          onOpenPlayer={() => launch('mediaPlayer')}
+        />
+      )}
 
       {windowManager.windows.map((window) => {
         const { id, appId, minimized, props, cascade } = window
@@ -365,7 +413,8 @@ function Desktop({ onReboot }) {
 
       <Taskbar
         items={taskbarItems}
-        onItemClick={windowManager.toggleFromTaskbar}
+        // Windows can't be minimized on a phone: a button only brings its window to the front
+        onItemClick={isMobile ? windowManager.restoreWindow : windowManager.toggleFromTaskbar}
         buttonRef={registerTaskbarButton}
         tray={<MessengerTrayIcon />}
       />

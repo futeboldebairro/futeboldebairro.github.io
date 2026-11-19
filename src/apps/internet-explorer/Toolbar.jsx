@@ -18,6 +18,7 @@ import { isInert } from '../../components/menu/menuItems'
 /*
  * IE6's "Botões padrão" toolbar. Some icons fill their whole 32px image and
  * are drawn smaller, so they match the others (which have a margin built in).
+ * On a phone only the `essential` buttons stay (see internet-explorer.css).
  */
 function Toolbar({ browser }) {
   const historyMenu = (entries, direction) =>
@@ -32,6 +33,7 @@ function Toolbar({ browser }) {
         icon={backIcon}
         label="Voltar"
         showLabel
+        essential
         disabled={!browser.canGoBack}
         onClick={() => browser.go(-1)}
         menuItems={historyMenu(browser.backEntries, -1)}
@@ -39,13 +41,14 @@ function Toolbar({ browser }) {
       <SplitButton
         icon={forwardIcon}
         label="Avançar"
+        essential
         disabled={!browser.canGoForward}
         onClick={() => browser.go(1)}
         menuItems={historyMenu(browser.forwardEntries, 1)}
       />
       <ToolbarButton icon={stopIcon} label="Parar" onClick={browser.stop} />
-      <ToolbarButton icon={refreshIcon} label="Atualizar" onClick={browser.refresh} />
-      <ToolbarButton icon={homeIcon} label="Página inicial" onClick={browser.goHome} />
+      <ToolbarButton icon={refreshIcon} label="Atualizar" essential onClick={browser.refresh} />
+      <ToolbarButton icon={homeIcon} label="Página inicial" essential onClick={browser.goHome} />
       <Separator />
       <ToolbarButton icon={searchIcon} label="Pesquisar" showLabel small />
       <ToolbarButton
@@ -91,11 +94,11 @@ const MAIL_MENU = [
 ]
 
 // Buttons without an onClick do nothing here, so they're greyed out
-function ToolbarButton({ icon, label, showLabel = false, small = false, pressed = false, disabled, onClick }) {
+function ToolbarButton({ icon, label, showLabel = false, small = false, pressed = false, essential = false, disabled, onClick }) {
   return (
     <button
       type="button"
-      className={`ie-tool ${pressed ? 'pressed' : ''}`}
+      className={`ie-tool ${pressed ? 'pressed' : ''} ${essential ? 'essential' : ''}`}
       title={label}
       aria-label={label}
       aria-pressed={pressed || undefined}
@@ -109,12 +112,12 @@ function ToolbarButton({ icon, label, showLabel = false, small = false, pressed 
 }
 
 // A button with a drop-down arrow beside it, each half clickable on its own
-function SplitButton({ icon, label, showLabel = false, disabled, onClick, menuItems }) {
+function SplitButton({ icon, label, showLabel = false, essential = false, disabled, onClick, menuItems }) {
   const buttonDisabled = disabled || !onClick
   const menuDisabled = disabled || menuItems.every(isInert)
 
   return (
-    <div className={`ie-tool-split ${buttonDisabled && menuDisabled ? 'disabled' : ''}`}>
+    <div className={`ie-tool-split ${buttonDisabled && menuDisabled ? 'disabled' : ''} ${essential ? 'essential' : ''}`}>
       <button
         type="button"
         className="ie-tool"

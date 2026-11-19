@@ -239,3 +239,57 @@ body {
 .xp-tray-menu-item:hover {
   text-decoration: underline;
 }
+
+/* ---------- Phone layout ---------- */
+
+/*
+ * On a phone (hooks/useIsMobile.js puts .is-mobile on <html>) the desktop is
+ * a "simple task" OS: windows always fill the screen above the taskbar, with
+ * a thin margin of wallpaper around them, and only have the close button.
+ */
+.is-mobile {
+  --mobile-window-gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+/* The dynamic height follows the phone browser's toolbars, so the taskbar isn't hidden under them */
+.is-mobile #root {
+  height: 100dvh;
+}
+
+.is-mobile .mobile-window {
+  inset: var(--mobile-window-gap) var(--mobile-window-gap) calc(30px + var(--mobile-window-gap));
+}
+
+/* The close button keeps XP's 21px look but takes a fingertip-sized touch around it */
+.is-mobile .xp-caption-button.close {
+  position: relative;
+}
+.is-mobile .xp-caption-button.close::after {
+  content: '';
+  position: absolute;
+  inset: -10px -8px -10px -12px;
+}
+
+/* The desktop's icons in rows across the screen, like a phone's home screen */
+.desktop-icons-mobile {
+  position: absolute;
+  inset: 0 0 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-content: start;
+  justify-items: center;
+  gap: 10px 0;
+  padding: 12px 4px;
+  overflow-y: auto;
+}
+
+/* Taskbar buttons are just their icons, wide enough for a finger */
+.xp-taskbar-item.compact {
+  width: 40px;
+  flex-shrink: 0;
+  justify-content: center;
+}
+.taskbar-items-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+}

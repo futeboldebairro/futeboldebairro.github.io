@@ -614,3 +614,83 @@
     opacity: 0;
   }
 }
+
+/* ---------- Phone layout ---------- */
+
+/*
+ * One column: the badge over the question, the answers full width and
+ * taller to tap, stakes and helps on rows of their own. The prize ladder
+ * goes (the header already says which question it is and what it's worth).
+ */
+.is-mobile .sf-ladder {
+  display: none;
+}
+.is-mobile .sf-main {
+  padding: 10px 10px 12px;
+  overflow-y: auto;
+}
+.is-mobile .sf-header {
+  flex-direction: column;
+  gap: 6px;
+}
+.is-mobile .sf-stage {
+  flex: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+}
+.is-mobile .sf-badge {
+  width: 140px;
+  height: 140px;
+  padding: 10px;
+}
+.is-mobile .sf-question {
+  width: 100%;
+}
+.is-mobile .sf-question-text {
+  font-size: 16px;
+  text-align: center;
+}
+.is-mobile .sf-option {
+  min-height: 42px;
+}
+.is-mobile .sf-footer {
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: auto;
+}
+.is-mobile .sf-stakes,
+.is-mobile .sf-helps {
+  justify-content: space-between;
+}
+.is-mobile .sf-stake {
+  flex: 1;
+}
+.is-mobile .sf-stake-value {
+  min-width: 0;
+  width: 100%;
+  padding: 3px 4px;
+}
+.is-mobile .sf-helps .sf-button {
+  flex: 1;
+  padding: 10px 6px;
+}
+.is-mobile .sf-confirm {
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+.is-mobile .sf-confirm span {
+  flex-basis: 100%;
+}
+.is-mobile .sf-confirm .sf-button {
+  flex: 1;
+  padding: 10px;
+}
+/* The host is smaller, standing over the bottom corner */
+.is-mobile .sf-host {
+  bottom: 96px;
+  width: 170px;
+}
+.is-mobile .sf-host-speech {
+  font-size: 13px;
+}

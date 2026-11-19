@@ -273,3 +273,28 @@
   color: #aaaaaa;
   font: 11px Verdana, sans-serif;
 }
+
+/* ---------- Phone layout ---------- */
+
+/* The menu and "Quem somos" stacked instead of side by side; the discography keeps its two cells per row */
+.is-mobile .geo-table:not(.geo-releases),
+.is-mobile .geo-table:not(.geo-releases) > tbody,
+.is-mobile .geo-table:not(.geo-releases) > tbody > tr,
+.is-mobile .geo-table:not(.geo-releases) > tbody > tr > td {
+  display: block;
+  width: auto;
+}
+.is-mobile .geo-table td {
+  padding: 8px;
+}
+.is-mobile .geo-menu li {
+  margin: 10px 0;
+}
+.is-mobile .geo-photos img {
+  max-width: 100%;
+  height: auto;
+}
+.is-mobile .geo-releases img {
+  max-width: 96px;
+  height: auto;
+}

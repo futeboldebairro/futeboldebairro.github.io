@@ -2,6 +2,7 @@ import { useState } from 'react'
 import collapseIcon from './assets/group-collapse.png'
 import expandIcon from './assets/group-expand.png'
 import { CONTACT_STATUS } from './statuses'
+import useIsMobile from '../../hooks/useIsMobile'
 
 /*
  * The contacts, sorted by status as MSN does by default: an "Online (n)"
@@ -61,6 +62,8 @@ function BuddyList({ contacts, onOpen }) {
 // One contact: status buddy, name, then " (Ausente)" and their personal message in grey
 function BuddyRow({ contact, selected, onSelect, onOpen }) {
   const status = CONTACT_STATUS[contact.status] ?? CONTACT_STATUS.offline
+  // A phone has no double click: a tap opens the conversation straight away
+  const isMobile = useIsMobile()
 
   return (
     <button
@@ -68,9 +71,9 @@ function BuddyRow({ contact, selected, onSelect, onOpen }) {
       role="treeitem"
       aria-selected={selected}
       className={`msn-buddy ${selected ? 'selected' : ''}`}
-      onClick={onSelect}
+      onClick={isMobile ? onOpen : onSelect}
       onFocus={onSelect}
-      onDoubleClick={onOpen}
+      onDoubleClick={isMobile ? undefined : onOpen}
       onKeyDown={(event) => event.key === 'Enter' && onOpen()}
     >
       <img src={status.icon} alt="" className="msn-buddy-icon" />

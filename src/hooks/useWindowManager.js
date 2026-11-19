@@ -71,14 +71,16 @@ function useWindowManager(initiallyOpen = []) {
     if (stack.at(-1) !== id) bringToFront(id)
   }
 
+  // Un-minimizes a window (if it was) and puts it on top
+  function restoreWindow(id) {
+    setMinimized(id, false)
+    bringToFront(id)
+  }
+
   // Like XP: clicking the active window's taskbar button minimizes it, any other button restores and focuses
   function toggleFromTaskbar(id) {
-    if (id === activeId) {
-      minimizeWindow(id)
-    } else {
-      setMinimized(id, false)
-      bringToFront(id)
-    }
+    if (id === activeId) minimizeWindow(id)
+    else restoreWindow(id)
   }
 
   return {
@@ -90,6 +92,7 @@ function useWindowManager(initiallyOpen = []) {
     closeWindow,
     minimizeWindow,
     focusWindow,
+    restoreWindow,
     toggleFromTaskbar,
   }
 }

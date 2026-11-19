@@ -10,6 +10,9 @@ const BLACK_DURATION = 700
 // XP drew its boot screen at 640×480 and the monitor stretched it
 const STAGE_WIDTH = 640
 const STAGE_HEIGHT = 480
+// On a screen taller than wide (a phone) only the middle of the stage, with the logo and the bar,
+// has to fit across; the copyright line moves under them (see boot-screen.css)
+const PORTRAIT_VISIBLE_WIDTH = 380
 
 /*
  * Windows XP's boot screen, laid out on XP's own 640×480 grid (measured
@@ -65,7 +68,9 @@ function useStageScale() {
 }
 
 function fitScale() {
-  return Math.min(window.innerWidth / STAGE_WIDTH, window.innerHeight / STAGE_HEIGHT)
+  const portrait = window.innerHeight > window.innerWidth
+  const visibleWidth = portrait ? PORTRAIT_VISIBLE_WIDTH : STAGE_WIDTH
+  return Math.min(window.innerWidth / visibleWidth, window.innerHeight / STAGE_HEIGHT)
 }
 
 export default BootScreen

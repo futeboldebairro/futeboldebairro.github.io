@@ -1,5 +1,4 @@
-import { ADS } from '../../components/retro-ads/ads'
-import { RetroAd, WithSideAds } from '../../components/retro-ads/RetroAds'
+import { RandomBanner, WithSideAds } from '../../components/retro-ads/RetroAds'
 import { INSTAGRAM, MUSIC_SERVICES } from '../../components/sidebar/externalLinks'
 import { BAND_MEMBERS } from '../futeborkut/data/database'
 import { FUTEBORKUT_URL } from '../futeborkut/links'
@@ -20,9 +19,6 @@ const TITLE = 'Futebol de Bairro'
 const SUBTITLE = 'galeria de shows do futebol de bairro'
 // How many of the neighbouring photos the left column shows, like Fotolog's "Fotos Recentes"
 const RECENT_COUNT = 6
-// The 2000s ads in the margins either side of the page
-const LEFT_ADS = [ADS.emoticons, ADS.icq]
-const RIGHT_ADS = [ADS.vanillaCoke, ADS.livrariaCultura]
 
 /** /futeboldebairro/ and /futeboldebairro/mosaic/: every show's photos as squares, newest first */
 export function MosaicPage() {
@@ -155,7 +151,7 @@ export function ErrorPage() {
 function Frame({ children }) {
   return (
     <div className="blog">
-      <WithSideAds left={LEFT_ADS} right={RIGHT_ADS}>
+      <WithSideAds>
       <div className="blog-page">
         <div className="blog-hat">
           <div className="blog-search">
@@ -183,7 +179,7 @@ function Frame({ children }) {
             BAIRROLOG<sup>™</sup>
           </BrowserLink>
           {/* Fotolog's banner ad, beside the logo */}
-          <RetroAd ad={ADS.msnCeline} />
+          <RandomBanner />
         </div>
 
         <nav className="blog-homenav">

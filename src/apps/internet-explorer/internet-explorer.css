@@ -496,3 +496,43 @@
 .ie-dialog-button:active {
   background: linear-gradient(to bottom, #e6e5df, #f3f2ee);
 }
+
+/* ---------- Phone layout ---------- */
+
+/*
+ * Only what a phone needs: one row with Voltar, Avançar, Atualizar and
+ * Página inicial (the site has no other way back, and the phone's own back
+ * button would leave it). The menu bar, address bar and status bar go.
+ */
+.is-mobile .ie-menubar-row,
+.is-mobile .ie-addressbar,
+.is-mobile .ie-statusbar,
+.is-mobile .ie-toolbar > :not(.essential),
+.is-mobile .ie-tool-arrow {
+  display: none;
+}
+.is-mobile .ie-toolbar {
+  gap: 4px;
+}
+.is-mobile .ie-tool {
+  min-width: 40px;
+  justify-content: center;
+}
+
+/*
+ * The 2000s ads on the pages (components/retro-ads): no columns of them
+ * either side of a page on a phone, and a banner shrinks to fit.
+ */
+.is-mobile .ie-content .retro-ads-page {
+  display: block;
+}
+.is-mobile .ie-content .retro-ads-rail {
+  display: none;
+}
+.is-mobile .ie-content .retro-ad {
+  max-width: 100%;
+}
+.is-mobile .ie-content .retro-ad img {
+  max-width: 100%;
+  height: auto;
+}

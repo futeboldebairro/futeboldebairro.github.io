@@ -22,10 +22,12 @@ const RECEDE_SPEED = 3
  * Camera positions (all in mm): a three-quarter view of the closed case,
  * straight on for the open case (centered on the hinge so both halves fit),
  * and close up on the disc once it's taken out.
+ * `fitsAspect` is the narrowest screen (width ÷ height) the view still fits
+ * across; on a narrower one the camera backs off (see ViewFitter).
  */
-const CLOSED_VIEW = { position: [190, 80, 360], target: [0, 0, 0] }
-const OPEN_VIEW = { position: [LAYOUT.left, -40, 470], target: [LAYOUT.left, 0, 0] }
-const DISC_VIEW = { position: [LAYOUT.left + 70, 50, 340], target: DISC_TAKEN_OUT }
+const CLOSED_VIEW = { position: [190, 80, 360], target: [0, 0, 0], fitsAspect: 0.85 }
+const OPEN_VIEW = { position: [LAYOUT.left, -40, 470], target: [LAYOUT.left, 0, 0], fitsAspect: 1.2 }
+const DISC_VIEW = { position: [LAYOUT.left + 70, 50, 340], target: DISC_TAKEN_OUT, fitsAspect: 0.75 }
 const ZOOM_LIMITS = { min: 100, max: 800 }
 const { ACTION } = CameraControlsImpl
 
@@ -45,7 +47,6 @@ function JewelCaseScene({
   onDiscClick,
   onReady,
 }) {
-  const controls = useRef(null)
   // Whether the pointer is over something that can be clicked, to show the hand cursor
   const [overClickable, setOverClickable] = useState(false)
   // The backdrop is the scene's own background: clear plastic refracts it, so it has to be in the scene
@@ -55,11 +56,7 @@ function JewelCaseScene({
   const lidClickable = !open || (bookletInside && release.booklet.length > 0 && !discOut)
   const discClickable = open && !discOut
 
-  // Glide to a good view whenever the case opens or closes, or the disc comes out
-  useEffect(() => {
-    const view = discOut ? DISC_VIEW : open ? OPEN_VIEW : CLOSED_VIEW
-    controls.current?.setLookAt(...view.position, ...view.target, true)
-  }, [open, discOut])
+  const view = discOut ? DISC_VIEW : open ? OPEN_VIEW : CLOSED_VIEW
 
   // r3f reports how far the pointer moved since pressing; a real drag isn't a click
   const isClick = (event) => event.delta <= CLICK_TOLERANCE
@@ -99,17 +96,7 @@ function JewelCaseScene({
       style={{ cursor: overClickable ? 'pointer' : undefined }}
     >
       <primitive attach="background" object={backdrop} />
-      <CameraControls
-        ref={controls}
-        minDistance={ZOOM_LIMITS.min}
-        maxDistance={ZOOM_LIMITS.max}
-        // Turn with the left button, zoom with the wheel, nothing else
-        mouseButtons={{ left: ACTION.ROTATE, middle: ACTION.NONE, right: ACTION.NONE, wheel: ACTION.DOLLY }}
-        touches={{ one: ACTION.TOUCH_ROTATE, two: ACTION.TOUCH_DOLLY, three: ACTION.NONE }}
-        smoothTime={0.35}
-        // A wheel notch zooms a little, not a lot
-        dollySpeed={0.35}
-      />
+      <FittedCameraControls view={view} />
 
       <Lights />
 
@@ -145,6 +132,39 @@ function JewelCaseScene({
         resolution={512}
       />
     </Canvas>
+  )
+}
+
+/*
+ * The camera controls, gliding to `view` whenever it changes (the case opens
+ * or closes, the disc comes out). The views are framed for a landscape
+ * window; on a narrower screen (a phone held upright) the camera backs off
+ * along the same line until the case fits across, and may zoom out that
+ * much further.
+ */
+function FittedCameraControls({ view }) {
+  const controls = useRef(null)
+  const aspect = useThree((state) => state.size.width / state.size.height)
+  // Rounded so small resizes don't re-trigger the glide (and undo the visitor's turning)
+  const backOff = Math.round(Math.max(1, view.fitsAspect / aspect) * 20) / 20
+
+  useEffect(() => {
+    const [x, y, z] = view.position.map((value, axis) => view.target[axis] + (value - view.target[axis]) * backOff)
+    controls.current?.setLookAt(x, y, z, ...view.target, true)
+  }, [view, backOff])
+
+  return (
+    <CameraControls
+      ref={controls}
+      minDistance={ZOOM_LIMITS.min}
+      maxDistance={ZOOM_LIMITS.max * backOff}
+      // Turn with the left button, zoom with the wheel, nothing else
+      mouseButtons={{ left: ACTION.ROTATE, middle: ACTION.NONE, right: ACTION.NONE, wheel: ACTION.DOLLY }}
+      touches={{ one: ACTION.TOUCH_ROTATE, two: ACTION.TOUCH_DOLLY, three: ACTION.NONE }}
+      smoothTime={0.35}
+      // A wheel notch zooms a little, not a lot
+      dollySpeed={0.35}
+    />
   )
 }
 

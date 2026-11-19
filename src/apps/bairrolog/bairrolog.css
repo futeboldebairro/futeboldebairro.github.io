@@ -353,3 +353,83 @@
 .blog-footer p {
   margin-top: 0.3em;
 }
+
+/* ---------- Phone layout ---------- */
+
+/*
+ * The page as wide as the phone. The strip of dead search and account links
+ * and the site menu go; the banner drops under the logo. On a photo page the
+ * photo comes first, then the recent photos and the friends, each as a row
+ * of thumbnails that wraps.
+ */
+.is-mobile .blog-page,
+.is-mobile .blog-header,
+.is-mobile .blog-title,
+.is-mobile .blog-wrapper,
+.is-mobile .blog-mosaic,
+.is-mobile .blog-error {
+  width: auto;
+}
+.is-mobile .blog-page {
+  border: 0;
+  padding: 0 8px;
+}
+.is-mobile .blog-hat,
+.is-mobile .blog-homenav {
+  display: none;
+}
+.is-mobile .blog-header {
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+}
+.is-mobile .blog-title {
+  border-top: 1px solid var(--blog-line);
+}
+
+.is-mobile .blog-wrapper {
+  flex-direction: column;
+}
+.is-mobile .blog-col {
+  width: auto;
+}
+.is-mobile .blog-center {
+  order: -1;
+  width: auto;
+  padding: 0;
+}
+.is-mobile .blog-left,
+.is-mobile .blog-right {
+  padding-top: 1em;
+  border-top: 1px solid var(--blog-line);
+}
+.is-mobile .blog-recent,
+.is-mobile .blog-sidethumbs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 12px;
+}
+.is-mobile .blog-left .blog-divider {
+  display: none;
+}
+/* Bigger targets to tap for the next and previous photo */
+.is-mobile .blog-photonav a {
+  display: inline-block;
+  padding: 8px 4px;
+}
+
+/* Three thumbnails to a row */
+.is-mobile .blog-mosaic-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.is-mobile .blog-mosaic-grid .blog-thumb img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.is-mobile .blog-mosaic-show h3 {
+  flex-direction: column;
+  gap: 2px;
+}

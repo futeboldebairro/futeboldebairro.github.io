@@ -91,3 +91,11 @@
   font: 13px/1 Arial, Helvetica, sans-serif;
   white-space: nowrap;
 }
+
+/* Upright, the stage's sides are off screen (BootScreen.jsx), so the copyright is centred under the bar */
+@media (orientation: portrait) {
+  .boot-copyright {
+    left: 50%;
+    translate: -50% 0;
+  }
+}

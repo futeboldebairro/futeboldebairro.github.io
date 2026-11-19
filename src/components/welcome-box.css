@@ -1,10 +1,43 @@
 /* The welcome message box shown over the bare wallpaper (WelcomeBox.jsx) */
 
 .welcome-screen {
+  /* How blurred the wallpaper is behind the box; the desktop clears it after OK */
+  --welcome-blur: 8px;
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
+}
+/* A layer between the wallpaper and the box that blurs what's behind it */
+.welcome-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--welcome-blur));
+}
+.welcome-box {
+  position: relative;
+}
+
+/*
+ * Laid over the desktop right after OK: starts with the same blur and
+ * clears it, so the desktop comes into focus (App.jsx removes it after).
+ * It doesn't take clicks, so the desktop works while it fades.
+ */
+.desktop-unblur {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  animation: desktop-unblur 700ms ease-out forwards;
+}
+@keyframes desktop-unblur {
+  from {
+    backdrop-filter: blur(8px);
+  }
+  to {
+    backdrop-filter: blur(0);
+  }
 }
 
 .welcome-box {

@@ -553,3 +553,28 @@
   border-color: #316ac5;
   background: #c1d2ee;
 }
+
+/* ---------- Phone layout ---------- */
+
+/*
+ * The conversation takes the whole width: the display pictures, the footer
+ * link and the band with the big buttons (they never did anything) go.
+ */
+.is-mobile .msn-cv-band,
+.is-mobile .msn-cv-pictures,
+.is-mobile .msn-cv-footer {
+  display: none;
+}
+.is-mobile .msn-history,
+.is-mobile .msn-composer {
+  right: 12px;
+}
+/* The body's MSN backdrop sits behind the pictures, which are gone */
+.is-mobile .msn-cv-body {
+  background: linear-gradient(#dde2f7, #d6e2f6 40px, #d9e4f5);
+}
+/* A taller Enviar, easier to hit */
+.is-mobile .msn-send {
+  top: 8px;
+  height: 46px;
+}

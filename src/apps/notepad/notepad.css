@@ -49,3 +49,8 @@
 .notepad-text::-webkit-scrollbar-corner {
   background: #ece9d8;
 }
+
+/* On a phone it's just the text: the menu only had word wrap and the like */
+.is-mobile .notepad .xp-menubar {
+  display: none;
+}

@@ -18,8 +18,19 @@
   padding-top: 10px;
   container-type: inline-size;
 }
+/* Each ad needs its width plus a little air; wider ones drop out first */
 @container (max-width: 176px) {
   .retro-ads-rail .retro-ad {
+    display: none;
+  }
+}
+@container (max-width: 196px) {
+  .retro-ads-rail .retro-ad-180 {
+    display: none;
+  }
+}
+@container (max-width: 266px) {
+  .retro-ads-rail .retro-ad-250 {
     display: none;
   }
 }
